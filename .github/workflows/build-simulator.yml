@@ -1,0 +1,53 @@
+name: Build simulator app (cloud testing)
+
+# Simulator build for cloud test services (Appetize.io, VibeView.io) and
+# CI screenshots. No signing needed — simulators don't require it.
+# The device .ipa is a different binary and is rejected by those services.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode
+        run: |
+          ls /Applications | grep Xcode
+          sudo xcode-select -s /Applications/Xcode_26*.app 2>/dev/null || \
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+
+      - name: Decode bundled WASM (pushed as base64 — connector is text-only)
+        run: openssl base64 -d -in ScamDestroyerIOS/Resources/playground/glue.wasm.b64 -out ScamDestroyerIOS/Resources/playground/glue.wasm
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build (simulator, unsigned)
+        run: |
+          xcodebuild build \
+            -project ScamDestroyerIOS.xcodeproj \
+            -scheme ScamDestroyerIOS \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Package simulator .app
+        run: |
+          APP=$(find build -name "ScamDestroyerIOS.app" -type d | head -1)
+          echo "Packaging $APP"
+          cd "$(dirname "$APP")"
+          zip -qry "$GITHUB_WORKSPACE/ScamDestroyerIOS-v1.0-simulator.zip" ScamDestroyerIOS.app
+          ls -la "$GITHUB_WORKSPACE/ScamDestroyerIOS-v1.0-simulator.zip"
+
+      - name: Upload simulator build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScamDestroyerIOS-v1.0-simulator-app
+          path: ScamDestroyerIOS-v1.0-simulator.zip

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Playground Studio</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0B0B0C; color: #E8ECF1; font-family: monospace; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #view { flex: 1.25; position: relative; min-height: 0; }
+  #view canvas { display: block; }
+  #viewLabel { position: absolute; top: 8px; left: 10px; font-size: 11px; letter-spacing: 2px; color: #00FF87; opacity: .85; pointer-events: none; }
+  #divider { height: 1px; background: #23262D; }
+  #editorWrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  #toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #101216; }
+  #runBtn { background: #00FF87; color: #04150B; border: none; font-family: monospace; font-weight: bold; font-size: 14px; letter-spacing: 1px; padding: 10px 18px; border-radius: 8px; }
+  #runBtn:disabled { background: #2A2E36; color: #6B7482; }
+  #clearBtn { background: transparent; color: #9AA7B8; border: 1px solid #2A2E36; font-family: monospace; font-size: 12px; padding: 9px 12px; border-radius: 8px; }
+  #status { font-size: 11px; color: #9AA7B8; margin-left: auto; }
+  #code { flex: 1; width: 100%; background: #0E1013; color: #D6F5E3; border: none; outline: none; resize: none; padding: 12px; font-family: monospace; font-size: 13px; line-height: 1.5; min-height: 0; }
+  #console { height: 22%; overflow-y: auto; background: #08090B; border-top: 1px solid #23262D; padding: 8px 10px; font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+  .log { color: #C9D4E0; }
+  .err { color: #FF5C5C; }
+  .sys { color: #00FF87; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="view"><div id="viewLabel">WORLD VIEWER</div></div>
+  <div id="divider"></div>
+  <div id="editorWrap">
+    <div id="toolbar">
+      <button id="runBtn" disabled>EXECUTE SCRIPT</button>
+      <button id="clearBtn">CLEAR</button>
+      <span id="status">engine starting…</span>
+    </div>
+    <textarea id="code" spellcheck="false">-- Welcome to the Playground. Press EXECUTE SCRIPT.
+-- Roblox-style API: Instance.new, Vector3, Color3, workspace, print
+
+local base = Instance.new("Part")
+base.Size = Vector3.new(12, 1, 12)
+base.Position = Vector3.new(0, 0.5, 0)
+base.Color = Color3.fromRGB(32, 34, 40)
+base.Parent = workspace
+
+for i = 1, 5 do
+    local p = Instance.new("Part")
+    p.Size = Vector3.new(7 - i, 1, 7 - i)
+    p.Position = Vector3.new(0, 1 + i, 0)
+    p.Color = Color3.fromHSV(i / 6, 0.65, 1)
+    p.Parent = workspace
+end
+
+local ball = Instance.new("SpherePart")
+ball.Size = Vector3.new(2.2, 2.2, 2.2)
+ball.Position = Vector3.new(0, 8.2, 0)
+ball.Color = Color3.fromRGB(0, 255, 135)
+ball.Parent = workspace
+
+print("Tower built. Now write your own!")</textarea>
+    <div id="console"></div>
+  </div>
+</div>
+<script src="three.min.js"></script>
+<script src="wasmoon.js"></script>
+<script src="fengari-web.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

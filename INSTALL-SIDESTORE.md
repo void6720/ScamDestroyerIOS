@@ -1,12 +1,15 @@
 # Install ScamDestroyer iOS with SideStore (free Apple ID)
 
+*Pinned to **iOS 26.0** — the build's MinimumOSVersion is verified 26.0, and
+SideStore's current build (0.7.0-alpha+) fully supports iOS 26.0.*
+
 SideStore signs apps **on the iPhone itself** with your own free Apple ID — no
 paid developer account, no computer needed after the one-time setup. Apps get
 a 7-day signature; SideStore refreshes them automatically in the background
 before they expire.
 
 ## You need
-- The iPhone/iPad (iOS 26 for ScamDestroyer — it is built with iOS 26 Liquid Glass)
+- The iPhone/iPad running **iOS 26.0** (this guide is pinned to 26.0; ScamDestroyer is built for iOS 26.0 — verified: the app's MinimumOSVersion is 26.0)
 - A free Apple ID (a secondary/burner ID is fine and commonly recommended)
 - One computer for the first setup only — Windows, Mac, **or Linux**
 - The free **LocalDevVPN** app from the App Store
@@ -43,5 +46,4 @@ before they expire.
 - Free-ID limits (Apple's, not ours): **3 active sideloaded apps** at a time
   (SideStore counts as one), **10 new App IDs per 7 days**.
 - If refresh fails: check Wi-Fi + LocalDevVPN are both on, close the app being
-  refreshed, retry. On iOS 26.4+, reinstalling SideStore via iloader fixes
-  stubborn VPN errors.
+  refreshed, then retry.

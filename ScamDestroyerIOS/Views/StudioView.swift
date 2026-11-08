@@ -51,6 +51,12 @@ struct PlaygroundWebView: UIViewRepresentable {
         content.add(context.coordinator, name: "log")
         config.userContentController = content
         let web = WKWebView(frame: .zero, configuration: config)
+        // Dark + non-opaque: if a load ever fails, the tab reads as the
+        // app's dark theme with the error in the strip below — never a
+        // silent white void (the v1.0 failure mode).
+        web.isOpaque = false
+        web.backgroundColor = UIColor(red: 0x0B / 255, green: 0x0B / 255, blue: 0x0C / 255, alpha: 1)
+        web.navigationDelegate = context.coordinator
         web.load(URLRequest(url: URL(string: "playground://local/index.html")!))
         return web
     }
@@ -58,12 +64,25 @@ struct PlaygroundWebView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
     func makeCoordinator() -> Coordinator { Coordinator(onLog: onLog) }
 
-    final class Coordinator: NSObject, WKScriptMessageHandler {
+    final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         let onLog: (String) -> Void
         init(onLog: @escaping (String) -> Void) { self.onLog = onLog }
         func userContentController(_ controller: WKUserContentController,
                                    didReceive message: WKScriptMessage) {
             if let text = message.body as? String { onLog(text) }
+        }
+        // v1.0 shipped with NO navigation delegate, so a failed load was
+        // completely invisible. Surface every outcome in the strip.
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            onLog("nav: page loaded")
+        }
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,
+                     withError error: Error) {
+            onLog("nav ERROR (provisional): \(error.localizedDescription)")
+        }
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!,
+                     withError error: Error) {
+            onLog("nav ERROR: \(error.localizedDescription)")
         }
     }
 }
@@ -76,15 +95,24 @@ final class PlaygroundSchemeHandler: NSObject, WKURLSchemeHandler {
         guard let url = task.request.url, url.host == "local" else {
             task.didFailWithError(URLError(.resourceUnavailable)); return
         }
-        let name = url.lastPathComponent
+        // THE v1.0 BUG: url.lastPathComponent INCLUDES the extension
+        // ("index.html"), and forResource expects the bare name — so the
+        // lookup searched for "index.html.html", every asset 404'd, and
+        // the tab painted a silent white page. Strip the extension.
+        let name = url.deletingPathExtension().lastPathComponent
         let ext = url.pathExtension
-        guard let file = Bundle.main.url(forResource: name, withExtension: ext,
-                                         subdirectory: "playground"),
-              let data = try? Data(contentsOf: file) else {
+        // Assets live under playground/ in the bundle; XcodeGen also
+        // places copies at the bundle root — try the folder first,
+        // then the root, so either layout serves.
+        let file = Bundle.main.url(forResource: name, withExtension: ext,
+                                   subdirectory: "playground")
+            ?? Bundle.main.url(forResource: name, withExtension: ext)
+        guard let file, let data = try? Data(contentsOf: file) else {
             task.didFailWithError(URLError(.fileDoesNotExist)); return
         }
         let mime = ["html": "text/html", "js": "text/javascript",
-                    "wasm": "application/wasm", "css": "text/css"][ext] ?? "application/octet-stream"
+                    "wasm": "application/wasm", "css": "text/css",
+                    "json": "application/json", "png": "image/png"][ext] ?? "application/octet-stream"
         let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1",
                                        headerFields: ["Content-Type": mime,
                                                       "Content-Length": "\(data.count)"])!

@@ -43,3 +43,10 @@ Apple's **Liquid Glass** design language (iOS 26): native glass tab bar,
 - The Studio playground is standard Lua (Wasmoon/Fengari), **not full
   Luau**, and the editor is a plain text view — same honest limits as the
   Android Studio tab.
+
+## License & Terms
+
+Copyright (c) 2026 void6720.
+
+The source code is released under the [MIT License](LICENSE).
+Use of the app and its builds is covered by the [Terms of Use](TERMS.md).

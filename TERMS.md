@@ -1,6 +1,6 @@
 # Terms of Use — ScamDestroyer for iOS
 
-Copyright (c) 2026 void6720. Last updated: November 7, 2026.
+Copyright (c) 2026 void6720. Last updated: November 8, 2026.
 
 These terms cover the ScamDestroyer for iOS app and the builds distributed
 from this repository. By downloading, installing, or using the app, you agree

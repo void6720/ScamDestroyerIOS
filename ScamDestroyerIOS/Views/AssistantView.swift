@@ -186,7 +186,7 @@ struct AssistantView: View {
 
 // MARK: - Chat state + Foundation Models session
 
-private struct ChatMessage: Identifiable, Equatable {
+struct ChatMessage: Identifiable, Equatable {
     let id = UUID()
     let isUser: Bool
     var text: String

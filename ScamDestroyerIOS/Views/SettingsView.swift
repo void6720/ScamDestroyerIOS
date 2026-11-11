@@ -22,7 +22,8 @@ struct SettingsView: View {
                 }
                 Section("About") {
                     LabeledContent("App", value: "ScamDestroyer for iOS")
-                    LabeledContent("Version", value: "1.0.1")
+                    LabeledContent("Version", value: "1.1.0")
+                    LabeledContent("Assistant", value: "On-device AI (Foundation Models)")
                     LabeledContent("Design", value: "Liquid Glass (iOS 26)")
                     LabeledContent("Edition", value: "Primary version")
                 }

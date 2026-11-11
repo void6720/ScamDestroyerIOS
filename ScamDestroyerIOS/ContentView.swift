@@ -20,6 +20,9 @@ struct ContentView: View {
             FilesView()
                 .tabItem { Label("Files", systemImage: "folder.fill") }
 
+            AssistantView()
+                .tabItem { Label("Assistant", systemImage: "sparkles") }
+
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
